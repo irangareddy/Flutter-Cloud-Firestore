@@ -1,4 +1,4 @@
 # Flutter Cloud Firestore
 
-A starter project
+A Final project
 

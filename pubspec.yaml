@@ -21,6 +21,12 @@ dependencies:
   # State Management
   provider: ^5.0.0
 
+  # Modal Bottom Sheet
+  modal_bottom_sheet: ^2.0.0
+  
+  # Flutter Slidable
+  #flutter_slidable: ^0.6.0
+
  
 
 dev_dependencies:
