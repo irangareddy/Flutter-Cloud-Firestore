@@ -1,28 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cloud_firestore/services/authentication_service.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-class Home extends StatefulWidget {
-  const Home({Key key}) : super(key: key);
+class FaveFlick extends StatefulWidget {
+  const FaveFlick({Key key}) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  _FaveFlickState createState() => _FaveFlickState();
 }
 
-class _HomeState extends State<Home> {
+class _FaveFlickState extends State<FaveFlick> {
 
-// 1
-  User user;
-
-  @override
-  void initState() {
-    setState(() {
-      // 2
-      user = context.read<AuthenticationService>().getUser();
-    });
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
