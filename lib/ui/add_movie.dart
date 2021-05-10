@@ -3,6 +3,12 @@ import 'package:flutter_cloud_firestore/utility/helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddMovie extends StatefulWidget {
+  // 1
+  final String id;
+  final bool isEditMode;
+  final String docId;
+
+  AddMovie({this.id, this.isEditMode, this.docId});
   @override
   _Addcollectiontate createState() => _Addcollectiontate();
 }
@@ -12,16 +18,32 @@ class _Addcollectiontate extends State<AddMovie> {
   TextEditingController _genreController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
 
-  //TODO 2: Add state varibles of CollectionReference & DocumentSnapshot
+  bool get _isEditMode => widget.isEditMode;
+  String get _id => widget.id;
+  String get _docId => widget.docId;
+
   CollectionReference collection;
   DocumentSnapshot document;
 
-
   @override
   void initState() {
-    // TODO 3: Get Collection
-    collection = FirebaseFirestore.instance.collection('movies');
+    collection = FirebaseFirestore.instance.collection(_id);
+    checkEdit();
     super.initState();
+  }
+
+  // 2
+  void checkEdit() async {
+    if (_isEditMode) {
+      document = await collection.doc(_docId).get();
+      Map<String, dynamic> movie =
+          new Map<String, dynamic>.from(document.data());
+      _titleController.text = movie['title'];
+      _genreController.text = movie['genre'];
+      setState(() {
+        _selectedDate = getDateTime(movie['release_date']);
+      });
+    }
   }
 
   @override
@@ -51,38 +73,40 @@ class _Addcollectiontate extends State<AddMovie> {
               onPressed: () {
                 if (_titleController.text != null &&
                     _genreController.text != null) {
-                      //TODO 5: Method Call to Create Document
-                      addDocument();
-
-                } else {
-                  showSnackbar(context, "Fill the Details Properly");
-                }
-
-                Navigator.of(context).pop();
+                  // 3
+             if (_isEditMode) {
+               updateDocument();
+             } else {
+                addDocument();
+             }
+          } else {
+          showSnackbar(context, "Fill the Details Properly");
+        }
+      Navigator.of(context).pop();
               },
-              child: Text(
-                "Add",
-                style: TextStyle(fontSize: 18, color: Colors.indigoAccent),
+              // 4
+         child: Text(
+  _isEditMode ? "Update" : "Add",
+  style: TextStyle(fontSize: 18, color: Colors.indigoAccent),
               ))
         ],
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: GestureDetector(
-          onTap: dismissKeyboard,
-                  child: Column(
+          onTap: _dismissKeyboard,
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
                 height: 10.0,
               ),
-              // 5
-              baseTitle('Title'),
-              baseTextField(
-                  hintText: 'Add Movie Title', controller: _titleController),
-              baseTitle('Genre'),
-              baseTextField(
-                  hintText: 'Action, Adventure', controller: _genreController),
+ baseTitle('Title'),
+ baseTextField(
+     hintText: 'Add Movie Title', controller: _titleController),
+ baseTitle('Genre'),
+ baseTextField(
+    hintText: 'Action, Adventure', controller: _genreController),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Row(
@@ -92,14 +116,14 @@ class _Addcollectiontate extends State<AddMovie> {
                     Padding(
                       padding: const EdgeInsets.only(right: 32),
                       child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.all(Radius.circular(4)),
+        decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.all(Radius.circular(4)),
                         ),
                         child: TextButton(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                            // 6
+            padding:
+                    const EdgeInsets.symmetric(horizontal: 4.0),
                             child: Text(
                                 "${_selectedDate.toLocal()}".split(' ')[0],
                                 style: TextStyle(
@@ -107,7 +131,7 @@ class _Addcollectiontate extends State<AddMovie> {
                                     fontWeight: FontWeight.w500,
                                     color: Colors.indigo)),
                           ),
-                          onPressed: () => _selectDate(context), // Refer step
+        onPressed: () => _selectDate(context), // Refer step
                         ),
                       ),
                     ),
@@ -121,51 +145,36 @@ class _Addcollectiontate extends State<AddMovie> {
     );
   }
 
+  Future<void> updateDocument() {
+    return collection
+        .doc(_docId) // Reference Doc Id to Update
+        .update({
+          'title': _titleController.text,
+          'genre': _genreController.text,
+          'release_date': _selectedDate,
+          'created': DateTime.now(),
+        })
+    .then((value) => print("Movie Updated"))
+    .catchError((error) => print("Failed to update user: $error"));
+  }
 
-  //TODO 4: Create a Document
   Future<void> addDocument() {
-    // Call the user's CollectionReference to add a new user
+    // Call the user's CollectionReference to add a new Movie
     return collection
         .add({
           'title': _titleController.text,
-          'genre': _genreController.text, 
+          'genre': _genreController.text,
           'release_date': _selectedDate,
-          'created': DateTime.now(), 
+          'created': DateTime.now(),
         })
-        .then((value) => print("Movie Added"))
-        .catchError((error) => print("Failed to add Movie: $error"));
+  .then((value) => print("Movie Added"))
+   .catchError((error) => print("Failed to add Movie: $error"));
   }
 
-
-  //TODO 6: Add Keyboard Dismiss Method
-   void dismissKeyboard() {
+  void _dismissKeyboard() {
     FocusScope.of(context).requestFocus(new FocusNode());
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // 7
   _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
@@ -189,9 +198,6 @@ class _Addcollectiontate extends State<AddMovie> {
         _selectedDate = picked;
       });
   }
-
-
-
 
   Padding baseTitle(String title) {
     return Padding(
@@ -241,10 +247,4 @@ class _Addcollectiontate extends State<AddMovie> {
       ),
     );
   }
-
-
-
-
-
-
 }
