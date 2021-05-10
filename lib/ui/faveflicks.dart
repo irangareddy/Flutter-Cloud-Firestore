@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cloud_firestore/services/authentication_service.dart';
 import 'package:provider/provider.dart';
 
-class FaveFlick extends StatefulWidget {
-  const FaveFlick({Key key}) : super(key: key);
+class FaveFlicks extends StatefulWidget {
+  const FaveFlicks({Key key}) : super(key: key);
 
   @override
-  _FaveFlickState createState() => _FaveFlickState();
+  _FaveFlicksState createState() => _FaveFlicksState();
 }
 
-class _FaveFlickState extends State<FaveFlick> {
-
-
+class _FaveFlicksState extends State<FaveFlicks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,10 +20,7 @@ class _FaveFlickState extends State<FaveFlick> {
         title: const Text(
           'FaveFlicks',
           style: TextStyle(
-              fontSize: 20, 
-              fontWeight: FontWeight.w500, 
-              color: Colors.white
-              ),
+              fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
         actions: [
           IconButton(
@@ -36,9 +31,11 @@ class _FaveFlickState extends State<FaveFlick> {
               })
         ],
       ),
-      body: Center(child: Text("Starter Project"),)
+      body: Center(
+        child: Text("Starter Project"),
+      ),
+
+      //TODO 1: Add Floating Action Button
     );
   }
 }
-
-

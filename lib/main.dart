@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'services/authentication_service.dart';
 // screens
-import 'ui/faveflick.dart';
+import 'ui/faveflicks.dart';
 import 'ui/auth/sign_in.dart';
 import 'ui/auth/sign_up.dart';
 import 'ui/auth/splash.dart';
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
           '/auth': (context) => AuthenticationWrapper(),
           '/signin': (context) => SignIn(),
           '/signup': (context) => SignUp(),
-          '/home': (context) => FaveFlick(),
+          '/faveflicks': (context) => FaveFlicks(),
         },
       ),
     );
@@ -61,7 +61,7 @@ class AuthenticationWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final firebaseuser = context.watch<User>();
     if (firebaseuser != null) {
-        return FaveFlick();
+        return FaveFlicks();
       } 
       return SignIn();
   }
