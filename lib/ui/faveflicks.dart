@@ -25,7 +25,7 @@ class _FaveFlicksState extends State<FaveFlicks> {
   void initState() {
     setState(() {
       user = context.read<AuthenticationService>().getUser();
-      collectionId = user.mail;
+      collectionId = user.email;
       collection = firebase.collection(collectionId);
     });
     super.initState();
