@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cloud_firestore/utility/helper.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddMovie extends StatefulWidget {
   @override
@@ -12,11 +13,14 @@ class _Addcollectiontate extends State<AddMovie> {
   DateTime _selectedDate = DateTime.now();
 
   //TODO 2: Add state varibles of CollectionReference & DocumentSnapshot
+  CollectionReference collection;
+  DocumentSnapshot document;
 
 
   @override
   void initState() {
     // TODO 3: Get Collection
+    collection = FirebaseFirestore.instance.collection('movies');
     super.initState();
   }
 
@@ -48,6 +52,7 @@ class _Addcollectiontate extends State<AddMovie> {
                 if (_titleController.text != null &&
                     _genreController.text != null) {
                       //TODO 5: Method Call to Create Document
+                      addDocument();
 
                 } else {
                   showSnackbar(context, "Fill the Details Properly");
@@ -63,51 +68,54 @@ class _Addcollectiontate extends State<AddMovie> {
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 10.0,
-            ),
-            // 5
-            baseTitle('Title'),
-            baseTextField(
-                hintText: 'Add Movie Title', controller: _titleController),
-            baseTitle('Genre'),
-            baseTextField(
-                hintText: 'Action, Adventure', controller: _genreController),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Row(
-                children: [
-                  baseTitle('Release Date'),
-                  Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 32),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      child: TextButton(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          // 6
-                          child: Text(
-                              "${_selectedDate.toLocal()}".split(' ')[0],
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.indigo)),
+        child: GestureDetector(
+          onTap: dismissKeyboard,
+                  child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 10.0,
+              ),
+              // 5
+              baseTitle('Title'),
+              baseTextField(
+                  hintText: 'Add Movie Title', controller: _titleController),
+              baseTitle('Genre'),
+              baseTextField(
+                  hintText: 'Action, Adventure', controller: _genreController),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Row(
+                  children: [
+                    baseTitle('Release Date'),
+                    Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 32),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
                         ),
-                        onPressed: () => _selectDate(context), // Refer step
+                        child: TextButton(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            // 6
+                            child: Text(
+                                "${_selectedDate.toLocal()}".split(' ')[0],
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.indigo)),
+                          ),
+                          onPressed: () => _selectDate(context), // Refer step
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -115,9 +123,24 @@ class _Addcollectiontate extends State<AddMovie> {
 
 
   //TODO 4: Create a Document
+  Future<void> addDocument() {
+    // Call the user's CollectionReference to add a new user
+    return collection
+        .add({
+          'title': _titleController.text,
+          'genre': _genreController.text, 
+          'release_date': _selectedDate,
+          'created': DateTime.now(), 
+        })
+        .then((value) => print("Movie Added"))
+        .catchError((error) => print("Failed to add Movie: $error"));
+  }
 
 
   //TODO 6: Add Keyboard Dismiss Method
+   void dismissKeyboard() {
+    FocusScope.of(context).requestFocus(new FocusNode());
+  }
 
 
 
